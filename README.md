@@ -1,8 +1,8 @@
 # Library Management System — Spring Boot API
 
 REST API for a small library management system: create, list, update and delete books and
-library members. It is one of two interchangeable backends for the same React frontend; the
-other implements the same API with Express.
+library members. It is the backend the React frontend is built against; a second backend
+implements the same endpoints with Express.
 
 **Live demo:** [library-app-hazel-psi.vercel.app](https://library-app-hazel-psi.vercel.app)
 (runs on this API; a shared public sandbox) · **Frontend:**
@@ -21,8 +21,8 @@ Java 17 · Spring Boot 4 · Spring Web MVC · Spring Data JPA · PostgreSQL · D
 - Layered structure: controllers → services → Spring Data repositories.
 - Hibernate runs in `validate` mode: the app checks at startup that the entities match the
   database schema and refuses to start on a mismatch, instead of altering the schema.
-- JSON uses snake_case field names, so both backends expose the same contract to the
-  frontend.
+- JSON uses snake_case field names. (The members username field is `user_name_string`
+  here and `user_name` in the Express version.)
 - `GET` by id returns `404` when the record doesn't exist.
 - CORS allows the local Vite dev server and Vercel deployments.
 
@@ -42,6 +42,9 @@ Java 17 · Spring Boot 4 · Spring Web MVC · Spring Data JPA · PostgreSQL · D
 | `DELETE` | `/api/users/{userId}` | Delete a member |
 
 ## Data model
+
+Verified against PostgreSQL 16: the application starts with Hibernate schema validation
+and creates books and members on this schema, which the Express version also uses.
 
 ```sql
 CREATE TABLE books (
