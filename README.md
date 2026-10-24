@@ -9,6 +9,9 @@ implements the same endpoints with Express.
 [tizreal/LibraryApp](https://github.com/tizreal/LibraryApp) · **Express version:**
 [tizreal/LibraryAppExpressBackend](https://github.com/tizreal/LibraryAppExpressBackend)
 
+The demo has fictional sample data and is a shared sandbox: changes are temporary and it
+resets automatically on startup and every 6 hours.
+
 The API runs on Render's free tier and sleeps when idle, so the first request can take a
 minute or two.
 
@@ -25,6 +28,11 @@ Java 17 · Spring Boot 4 · Spring Web MVC · Spring Data JPA · PostgreSQL · D
   here and `user_name` in the Express version.)
 - `GET` by id returns `404` when the record doesn't exist.
 - CORS allows the local Vite dev server and Vercel deployments.
+- Demo reset (`demo/DemoResetService`), off unless `LIBRARY_DEMO_RESET=true`: one transaction
+  truncates and reloads the sample data, so a failure keeps the previous data; an advisory
+  lock skips overlapping runs; it refuses to run if the `users` table has columns this app
+  doesn't define or the data exceeds a row limit. Runs on startup and on
+  `LIBRARY_DEMO_RESET_CRON` (default every 6 hours). There is no HTTP endpoint for it.
 
 ## API
 
@@ -79,6 +87,16 @@ database without SSL, remove that parameter from `spring.datasource.url` in
 `src/main/resources/application.properties`.
 
 A multi-stage `Dockerfile` builds and runs the JAR for deployment.
+
+## Testing
+
+```bash
+./mvnw verify      # requires Docker: integration tests use a PostgreSQL 16 container
+```
+
+Integration tests cover the demo reset against real PostgreSQL (exact data, repeatability,
+rollback on failure, concurrent runs, and both safety guards). GitHub Actions runs
+`./mvnw -B verify` on every push and pull request.
 
 ## Project structure
 
