@@ -50,6 +50,7 @@ public class UserService {
 			User user = existingUser.get();
 			user.setFirstName(updatedUser.getFirstName());
 			user.setLastName(updatedUser.getLastName());
+			user.setUserNameString(updatedUser.getUserNameString());
 			user.setUpdatedAt(LocalDateTime.now()); // stamp the update time
 			return userRepository.save(user); // save() on existing entity = UPDATE
 		} else {
