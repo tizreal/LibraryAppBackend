@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.tca.libraryApp.entity.User;
 import com.tca.libraryApp.repository.UserRepository;
@@ -54,10 +56,12 @@ public class UserService {
 			user.setUpdatedAt(LocalDateTime.now()); // stamp the update time
 			return userRepository.save(user); // save() on existing entity = UPDATE
 		} else {
-			// RuntimeException causes Spring to return HTTP 500.
-			// In production you would use a custom NotFoundException mapped to 404.
-			throw new RuntimeException("User not found with ID: " + userId);
+			throw notFound(userId);
 		}
+	}
+
+	private static ResponseStatusException notFound(Integer userId) {
+		return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with ID: " + userId);
 	}
 
 	// ── DELETE ─────────────────────────────────────────────────────────────
@@ -65,7 +69,7 @@ public class UserService {
 		if (userRepository.existsById(userId)) {
 			userRepository.deleteById(userId);
 		} else {
-			throw new RuntimeException("User not found with ID: " + userId);
+			throw notFound(userId);
 		}
 	}
 

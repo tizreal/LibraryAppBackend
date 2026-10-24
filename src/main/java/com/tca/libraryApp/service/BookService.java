@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.tca.libraryApp.entity.Book;
 import com.tca.libraryApp.repository.BookRepository;
@@ -45,8 +47,12 @@ public class BookService {
 			book.setPublicationYear(updatedBook.getPublicationYear());
 			return bookRepository.save(book);
 		} else {
-			throw new RuntimeException("Book not found with ID: " + bookId);
+			throw notFound(bookId);
 		}
+	}
+
+	private static ResponseStatusException notFound(Integer bookId) {
+		return new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found with ID: " + bookId);
 	}
 
 	// DELETE
@@ -54,7 +60,7 @@ public class BookService {
 		if (bookRepository.existsById(bookId)) {
 			bookRepository.deleteById(bookId);
 		} else {
-			throw new RuntimeException("Book not found with ID: " + bookId);
+			throw notFound(bookId);
 		}
 	}
 
@@ -70,9 +76,7 @@ public class BookService {
 	 * fields, then save. This preserves fields we are not updating (e.g. createdAt)
 	 * instead of wiping them.
 	 * 
-	 * RuntimeException on not found — in production you would create a custom
-	 * NotFoundException annotated with @ResponseStatus(HttpStatus.NOT_FOUND) to
-	 * return 404 instead of 500.
+	 * A missing id answers 404 Not Found (ResponseStatusException).
 	 */
 
 }
